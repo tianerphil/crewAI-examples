@@ -23,7 +23,7 @@ class TravelAgents:
     def __init__(self):
         self.OpenAIGPT35 = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
         self.OpenAIGPT4 = ChatOpenAI(model_name="gpt-4", temperature=0.7)
-        #self.GoogleGemini = ChatGoogleGenerativeAI(model="gemini-pro", verbose=True, temperature=1.0, google_api_key=os.environ.get("GOOGLE_API_KEY")),
+        self.GoogleGemini = ChatGoogleGenerativeAI(model="gemini-pro", verbose=True, temperature=1.0)
         self.Ollama = Ollama(model="openhermes")
 
     def expert_travel_agent(self):
@@ -37,7 +37,7 @@ class TravelAgents:
                    CalculatorTools.calculate],
             allow_delegation=False,
             verbose=True,
-            llm=self.OpenAIGPT35,
+            llm=self.GoogleGemini
         )
 
     def city_selection_expert(self):
@@ -48,7 +48,7 @@ class TravelAgents:
             tools=[SearchTools.search_internet],
             allow_delegation=False,
             verbose=True,
-            llm=self.OpenAIGPT35,
+            llm=self.GoogleGemini
         )
     def local_tour_guide(self):
         return Agent(
@@ -60,5 +60,5 @@ class TravelAgents:
             tools=[SearchTools.search_internet],
             allow_delegation=False,
             verbose=True,
-            llm=self.OpenAIGPT35,
+            llm=self.GoogleGemini
         )
