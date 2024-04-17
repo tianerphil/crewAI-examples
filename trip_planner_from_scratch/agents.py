@@ -19,46 +19,102 @@ Notes:
 # This is an example of how to define custom agents.
 # You can define as many agents as you want.
 # You can also define custom tasks in tasks.py
-class TravelAgents:
+class ResearchAgents:
     def __init__(self):
         self.OpenAIGPT35 = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
-        self.OpenAIGPT4 = ChatOpenAI(model_name="gpt-4", temperature=0.7)
-        self.GoogleGemini = ChatGoogleGenerativeAI(model="gemini-pro", verbose=True, temperature=1.0)
+        self.OpenAIGPT4 = ChatOpenAI(model_name="gpt-4-turbo", temperature=0.7)
+        self.GoogleGemini = ChatGoogleGenerativeAI(model="gemini-pro", verbose=True, temperature=0.7)
         self.Ollama = Ollama(model="openhermes")
 
-    def expert_travel_agent(self):
+    def technical_writer(self):
         return Agent(
-            role="Expert Travel Agent",
-            backstory=dedent(f"""Expert in travel planning and logistics.
-                             I have decades of experience in making travel plans for clients."""),
-            goal=dedent(f"""create a 7-day travel itinerary with detailed per day plan,
-                        including budget, accommodation, and activities, packing suggestions, and safty tips"""),
+            role="technical writer",
+            backstory=dedent(f"""A skilled communicator with a background in technology and a talent for 
+                             translating complex information into clear, concise, and engaging narratives.
+                             """),
+            goal=dedent(f""" 
+                        To synthesize the findings from the Visionary Director, Technical Architect, 
+                        and Audience Advocate into a comprehensive and cohesive report.
+                        To effectively communicate the potential of realistic avatar technology for 
+                        online streaming to a broad audience, including stakeholders, investors, and the general public.
+                        To document the entire research process and findings in a clear and organized manner 
+                        for future reference and development efforts.
+                        """),
+            #TODO: Add more tools
+            tools=[SearchTools.search_internet,
+                   SearchTools.search_github],    
+            allow_delegation=False,
+            verbose=True,
+            llm=self.OpenAIGPT35
+            #llm=self.OpenAIGPT4
+            #llm=self.GoogleGemini
+        )
+    
+    def vision_director(self):
+        return Agent(
+            role="AI Technology Vision Director",
+            backstory=dedent(f"""A veteran AI technology director with a passion for pushing technological 
+                             boundaries and exploring new forms of storytelling. Believes avatars can 
+                             revolutionize entertainment and communication."""),
+            goal=dedent(f""" 
+                        To identify the cutting-edge technologies enabling highly realistic avatar creation.
+                        To understand the potential applications and limitations of these technologies.
+                        To envision the future of interactive entertainment using realistic avatars.
+                        """),
+            #TODO: Add more tools
             tools=[SearchTools.search_internet, 
+                   SearchTools.search_github, 
+                   CalculatorTools.calculate], 
+            allow_delegation=False,
+            verbose=True,
+            llm=self.OpenAIGPT35
+            #llm=self.OpenAIGPT4
+            #llm=self.GoogleGemini
+        )
+
+    def technical_architect(self):
+        return Agent(
+            role="Technical Architect",
+            backstory=dedent(f"""A skilled software engineer with expertise in computer graphics, 
+                             machine learning, and real-time systems. Fascinated by the intersection 
+                             of AI and human-computer interaction."""),
+            goal=dedent(f"""
+                        To evaluate the technical feasibility of building a realistic, interactive 
+                        avatar for live streaming. 
+                        To assess the computational resources and infrastructure 
+                        required for such a system. 
+                        To identify potential technical hurdles and propose solutions.
+                        """),
+            #TODO: Add more tools
+            tools=[SearchTools.search_internet,
+                   SearchTools.search_github, 
                    CalculatorTools.calculate],
             allow_delegation=False,
             verbose=True,
-            llm=self.GoogleGemini
+            llm=self.OpenAIGPT35
+            #llm=self.OpenAIGPT4
+            #llm=self.GoogleGemini
         )
+    def audience_advocate(self):
+        return Agent(
+            role="The Audience Advocate",
+            backstory=dedent(f"""A social media influencer and content creator with a large and engaged 
+                             online audience. Passionate about building genuine connections and fostering 
+                             interactive communities."""),
+            goal=dedent(f"""
+                        To understand the audience's expectations and desires regarding realistic 
+                        avatars in live streaming.
+                        To identify potential ethical concerns and social implications of using such technology. 
+                        To ensure the avatar experience is engaging, inclusive, and respectful of user privacy.
+                        """),
+            #TODO: Add more tools
+            tools=[SearchTools.search_internet,
+                   SearchTools.search_github],
+            allow_delegation=False,
+            verbose=True,
+            llm=self.OpenAIGPT35
+            #llm=self.OpenAIGPT4
+            #llm=self.GoogleGemini
+        )
+    
 
-    def city_selection_expert(self):
-        return Agent(
-            role="City Selection Expert",
-            backstory=dedent(f"""Expert at analyzing and selecting cities for travel."""),
-            goal=dedent(f"""Select the best cities based on weather, season, price, and activities for a 7-day trip"""),
-            tools=[SearchTools.search_internet],
-            allow_delegation=False,
-            verbose=True,
-            llm=self.GoogleGemini
-        )
-    def local_tour_guide(self):
-        return Agent(
-            role="Local Tour Guide",
-            backstory=dedent(f"""Konwledgeable about local culture, history, and attractions.
-                             extensive experience in guiding tourists and travelers.
-                             very familiar with the local area, the attractions, and customs."""),
-            goal=dedent(f"""Provide best insights, tips, and recommendations about the selected city"""),
-            tools=[SearchTools.search_internet],
-            allow_delegation=False,
-            verbose=True,
-            llm=self.GoogleGemini
-        )
