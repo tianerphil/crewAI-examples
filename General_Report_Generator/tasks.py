@@ -1,114 +1,99 @@
-from crewai import Task
+from crewai import Task, Agent
 from textwrap import dedent
-from datetime import date
-
 
 class ResearchTasks():
-  def __tip_section(self):
-    return "If you do your BEST WORK, I'll tip you $100!"
-  
-  def technical_writer_task(self, agent):
-    return Task(description=dedent(f"""
-        Task: 
-          Synthesize research findings into a comprehensive report on realistic avatars for online streaming.
-        Description: 
-          1. Collaborate with the other roles to gather and synthesize all research findings into a cohesive report.
-          2. Clearly present all the information from other roles in an organized and engaging manner.
-          3. Provide a clear conclusion and recommendation for the most promising development path based on the 
-            research findings.
-        Notes:
-          {self.__tip_section()}
-        """),
-        expected_output=dedent(f"""
-          1. A well-structured and informative consolidation of all the information from Visionary Director, Technical Architect, 
-            and Audience Advocate roles
-          2. The report should including ALL information from the Visionary Director, Technical Architect, and Audience
-            Advocate roles, put them in organized way. DO NOT ignore any information in the reports of other agents.
-          3. The report should give recommandation on most promising technical approach, addressing potential challenges,
-            and providing a roadmap for future development.
-        """),
-        agent=agent)
-  
-  def vision_director_task(self, agent):
-    return Task(description=dedent(f"""
-        Task: 
-          Research emerging technologies of reslistic avatar creation for online streaming.           
-        Description:                       
-          1. Research existing and emerging technologies for realistic avatar creation, including:
-            1.1 Facial animation: 3D modeling, motion capture, facial rigging, expression transfer.
-            1.2 Voice synthesis: Text-to-speech, voice cloning, emotional speech generation.
-            1.3 Body movement and gesture recognition: Motion capture, pose estimation, full-body tracking.
-            1.4 Machine learning and AI algorithms for avatar generation.
-            1.5 Real-time rendering engines and streaming protocols.
-          2. Identify leading opensource project on github, topics on reddit, or companies and research 
-            institutions working in these areas.
-          3. Analyze the capabilities and limitations of current technical approaches.
-            3.1 Uncanny valley effects and realism thresholds.
-            3.2 Performance and scalability issues for real-time rendering.
-            3.3 Legal and ethical considerations for avatar use and representation.
-          4. Explore the potential applications of realistic avatars in online streaming, including:
-            4.1 Interactive live streams and virtual events.
-            5.2 Personalized content creation and storytelling.
-            6.3 Virtual influencers and digital celebrities.
-        Notes: 
-          {self.__tip_section()}
-        """),
-        expected_output=dedent(f"""
-          1. A comprehensive report outlining the state-of-the-art in realistic avatar creation.
-          2. Insights into the future possibilities and potential impact of this technology. 
-        """),
-        agent=agent)
+  #def __tip_section(self):
+  #  return "If you do your BEST WORK, I'll tip you $100!"
 
-  def technical_architect_task(self, agent):
-    return Task(description=dedent(f"""
-        Task: 
-          Research implementation approaches for realistic avatar creation for the streaming purpose.                       
-        Description: 
-          1. Search and investigate throughly from github and reddit for the existing framework and projects.
-          2. Evaluate different technical approaches for creating realistic avatars for live streaming, 
-            including:
-            2.1 realistic model-based avatars: Analyze rigging complexity, animation techniques, and 
-                real-time rendering requirements.
-            2.2 Deep learning-based avatars: Explore generative adversarial networks (GANs) and other 
-                deep learning models for avatar generation and animation.
-            2.3 Hybrid approaches: Investigate combining 3D models with deep learning for enhanced 
-                realism and flexibility.
-            2.4 Integration of voice synthesis and speech recognition.
-          3. Assess hardware and software needs for each approach, including processing power, GPUs, and 
-            specialized software tools.
-          4. Investigate cloud-based solutions and potential infrastructure costs.
-          5. Identify potential technical challenges and limitations of implementing realistic avatars for 
-            live streaming. Propose solutions or workarounds for addressing these challenges.
-        Notes:
-          {self.__tip_section()}
-        """),
-        expected_output=dedent(f"""
-          1. A technical feasibility report comparing different approaches, outlining their pros and cons, 
-            resource requirements, and potential challenges, DO LIST the similar project on github for each 
-            of the approaches.
-          2. Recommendations for the most viable technical approach based on project goals and constraints.
-        """),
-        agent=agent)
+  def topic_investigator_task(
+      self, 
+      agent : Agent, 
+      TOPIC : str, 
+      PRIMARY_GOAL : str | None = None
+      ) -> Task:
+      return Task(description=dedent(f"""
+          1.Initial Topic Exploration (Considering TOPIC and PRIMARY_GOAL): Conduct a thorough 
+          exploration of the provided topic: {TOPIC}, taking into account the research primary 
+          goal: {PRIMARY_GOAL}. Utilize diverse online resources, academic databases, and relevant 
+          news articles to gather comprehensive background information.
+          2.Identify Key Research Questions: Analyze the initial exploration summary and formulate
+          specific research questions aligned with the identified areas for deeper investigation 
+          and {PRIMARY_GOAL}.
+          """),
+          expected_output=dedent(f"""
+          1.A structured summary that defines the topic, outlines key subtopics, identifies relevant 
+          statistics and controversies, and highlights areas for deeper investigation based on the
+          goal: {PRIMARY_GOAL}. This summary will directly inform the subsequent research questions.
+          2.A list of 3-5 clear and focused research questions directly derived from the findings of 
+          the initial exploration and aligned with the topic and primary goal. These questions will 
+          guide the Evidence Gatherer in their search for relevant sources.
+          """),
+          agent=agent)
 
-  def audience_advocate_task(self, agent):
-    return Task(description=dedent(f"""
-        Task: 
-          Research the user experience and ethical implications of realistic avatars for online streaming.
-        Description: 
-          1. Conduct audience research through surveys, interviews, and focus groups to understand:
-            1.1 Perceptions and expectations of realistic avatars in online streaming.
-            1.2 Desired levels of interactivity and engagement.
-            1.3 Potential concerns regarding privacy, authenticity, and the uncanny valley effect.
-          2. Investigate ethical considerations surrounding the use of realistic avatars, such as potential for 
-            misuse, deepfakes, and bias.
-          3. Analyze existing online communities and virtual influencers to understand audience engagement dynamics.
-        Notes:
-          {self.__tip_section()}
-        """),
-        expected_output=dedent(f"""
-          1. A comprehensive report summarizing audience research findings and identifying key considerations for 
-            developing engaging and ethical realistic avatar experiences.
-          2. Recommendations for responsible development and deployment of the technology to ensure audience trust 
-            and acceptance.
-        """),
-        agent=agent)
+  def evidence_getherer_task(
+      self, 
+      agent : Agent
+      ) -> Task :
+      return Task(description=dedent(f"""
+          1.Source Acquisition: Utilize the research questions provided by Dr. Petrova to search for and 
+          retrieve relevant sources such as academic papers, industry reports, and statistical datasets. Focus on 
+          acquiring credible and diverse sources that address each research question from multiple perspectives.
+          2.Data Extraction & Analysis: Analyze the gathered sources, extracting key findings and data 
+          points that directly address the research questions. Employ appropriate data analysis techniques and 
+          statistical methods to identify patterns, trends, and insights.
+          """),
+          expected_output=dedent(f"""
+          1.A collection of annotated sources directly related to the EACH OF the research questions, NO NOT miss
+          any research questions. Each source will have a brief description explaining how it addresses the 
+          corresponding question.
+          2.A structured summary of findings organized by each of the research questions. Each question will have a 
+          dedicated section with key data points, relevant statistics, charts, and quotes from sources, 
+          all clearly linked to the research question they address. DO NOT MISS any of the research questions.
+          """),
+          agent=agent)
+
+  def data_analyst_task(
+      self, 
+      agent : Agent
+      ) -> Task:
+      return Task(description=dedent(f"""
+          Data Interpretation: visit all the links provided by Dr. Chen one by one, do not miss any. 
+          read, understand and analyze all of the content. extract all contents in relation to
+          the research questions. identify key point, patterns, trends, correlations, and potential causations 
+          to support answering research questions.
+          """),
+          expected_output=dedent(f"""
+          A long, detailed narrative serve as a database, including all contents related to the research questions, 
+          all data analysis evidences, findings, insights, visualizations (charts, graphs), identified trends, 
+          and statistically significant observations you have found in the content which can help to answer the rearch questions. 
+          This report will used to compose the final answer to the research report. This output will serve as a 
+          crucial input and information pool for the Report Synthesizer.
+          """),
+          agent=agent)
+  
+  def report_synthesizer_task(
+      self, 
+      agent : Agent
+      ) -> Task:
+      return Task(description=dedent(f"""
+          1.Insight Synthesis: Based on the Data Analyst (Dr. David Kim) output, synthesize all contents, key 
+          insights and conclusions that directly address the research questions. give a clear, solid, exhausitive answer 
+          to all of the research questions with data evidences. All research questions SHALL be answered DO NOT 
+          ignore any of the research questions. 
+          2.Report Drafting: considering all the output from Topic Investigator (Dr. Anya Petrova), and 
+          Data Analyst (Dr. David Kim), generate the outline for the report. Write the research report following the 
+          outline items. Integrate all the context information, data analysis findings and their implications into a 
+          compelling narrative, finally addresses each research questions and guides the reader towards a comprehensive 
+          understanding of the topic. 
+          """),
+          expected_output=dedent(f"""
+          1.A refined draft of the detailed narrative to directly address each of research question one by one.
+          all the research questions SHALL be answered in clear, solid, exhausitive manner with data and evidence.
+          DO NOT miss any of the questions.
+          2.A complete research report with all sections and sub-sections of the outline being explained thoughly 
+          with data, information and findings insights revealed in the previous research process, all research 
+          questions should be highlighted and answered thoughly, clearly with data and evidence. make the report 
+          exausitive, convincing and engaging.
+          """),
+          agent=agent)
+  

@@ -15,8 +15,14 @@ load_dotenv()
 # You can define as many agents and tasks as you want in agents.py and tasks.py
 
 class ResearchCrew:
-    def __init__(self):
+    def __init__(self, TOPIC, PRIMARY_GOAL):
+        if TOPIC is None or not isinstance(TOPIC, str):
+            raise ValueError("Please provide a valid TOPIC")
+        else:
+            self.TOPIC = TOPIC
+            self.PRIMARY_GOAL = PRIMARY_GOAL
         print("## Creating crew for Research")
+
 
     def run(self):
         # Define your custom agents and tasks in agents.py and tasks.py
@@ -24,33 +30,35 @@ class ResearchCrew:
         tasks = ResearchTasks()
 
         # Define your custom agents and tasks here
-        vision_director_agent = agents.vision_director()
-        technical_architect_agent = agents.technical_architect()
-        audience_advocate_agent = agents.audience_advocate()
-        technical_writer_agent = agents.technical_writer()
+        topic_investigator_agent = agents.topic_investigator()
+        evidence_getherer_agent = agents.evidence_getherer()
+        data_analyst_agent = agents.data_analyst()
+        report_synthesizer_agent = agents.report_synthesizer()
 
         # Custom tasks include agent name and variables as input
-        vision_director_task = tasks.vision_director_task(
-            vision_director_agent)
-
-        technical_architect_task= tasks.technical_architect_task(
-            technical_architect_agent)
-
-        audience_advocate_task = tasks.audience_advocate_task(
-            audience_advocate_agent)
-        technical_writer_task = tasks.technical_writer_task(
-            technical_writer_agent)
+        topic_investigator_task = tasks.topic_investigator_task(
+            topic_investigator_agent, self.TOPIC, self.PRIMARY_GOAL)
+        evidence_getherer_task= tasks.evidence_getherer_task(
+            evidence_getherer_agent)
+        data_analyst_task = tasks.data_analyst_task(
+            data_analyst_agent)
+        report_synthesizer_task = tasks.report_synthesizer_task(
+            report_synthesizer_agent)
         
+        evidence_getherer_task.context = [topic_investigator_task]
+        data_analyst_task.context = [evidence_getherer_task]
+        report_synthesizer_task.context = [data_analyst_task, topic_investigator_task]
+
         # Define your custom crew here
         crew = Crew(
-            agents=[audience_advocate_agent,
-                    vision_director_agent, 
-                    technical_architect_agent, 
-                    technical_writer_agent],
-            tasks=[audience_advocate_task,
-                   vision_director_task,
-                   technical_architect_task, 
-                   technical_writer_task],
+            agents=[topic_investigator_agent,
+                    evidence_getherer_agent, 
+                    data_analyst_agent, 
+                    report_synthesizer_agent],
+            tasks=[topic_investigator_task,
+                   evidence_getherer_task,
+                   data_analyst_task, 
+                   report_synthesizer_task],
             verbose=True,
             process=Process.sequential)
 
@@ -63,7 +71,16 @@ if __name__ == "__main__":
     print("## Welcome to Research Crew")
     print("-------------------------------")
 
-    custom_crew = ResearchCrew()
+    TOPIC = input(
+        dedent("""
+        Please tell me what topic come accross your dummy head today?
+        """))
+    PRIMARY_GOAL = input(
+        dedent("""
+        Please whisper me your primary goal for this research?
+        """))
+    
+    custom_crew = ResearchCrew(TOPIC, PRIMARY_GOAL)
     result = custom_crew.run()
     print("\n\n########################")
     print("## Here is you Research Crew run result:")
